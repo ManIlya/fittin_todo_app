@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:todo_app/page/todo_add_page.dart';
 import 'package:todo_app/page/todo_list_page.dart';
 
 void main() {
@@ -28,9 +29,19 @@ class MyApp extends StatelessWidget {
             height: 32 / 24,
             fontWeight: FontWeight.bold,
           ),
+          titleSmall: GoogleFonts.montserrat(
+            fontSize: 16,
+            height: 20 / 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-      home: const TodoListPage(),
+      routes: {
+        '/': (context) => TodoListPage(),
+        '/add': (context) => TodoAddPage(),
+
+      },
+      initialRoute: '/',
     );
   }
 }
