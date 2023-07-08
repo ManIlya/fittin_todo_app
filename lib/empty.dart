@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 
-class TodoEmpty{
+class TodoEmpty {
   int id;
   String task;
   DateTime? date;
   bool completed;
 
-  TodoEmpty({required this.id, required this.task, this.date, this.completed=false});
+  TodoEmpty(
+      {required this.id,
+      required this.task,
+      this.date,
+      this.completed = false});
 
   Map<String, dynamic> toJson() {
     return {
       'task': task,
       'completed': completed,
-      'date': date!=null?date!.toIso8601String():null,
+      'date': date != null ? date!.toIso8601String() : null,
     };
   }
 
@@ -20,7 +24,7 @@ class TodoEmpty{
     return TodoEmpty(
       id: UniqueKey().hashCode,
       task: json['task'],
-      date: json['date']!=null?DateTime.parse(json['date']):null,
+      date: json['date'] != null ? DateTime.parse(json['date']) : null,
       completed: json['completed'],
     );
   }

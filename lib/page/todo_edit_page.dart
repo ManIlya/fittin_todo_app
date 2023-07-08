@@ -2,16 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/empty.dart';
 import 'package:todo_app/services.dart';
 
-class TodoAddPage extends StatefulWidget {
-  const TodoAddPage({super.key});
+class TodoEditPage extends StatefulWidget {
+  TodoEmpty editingTodo;
+  TodoEditPage(this.editingTodo, {super.key});
 
   @override
-  State<TodoAddPage> createState() => _TodoAddPageState();
+  State<TodoEditPage> createState() => _TodoEditPageState();
 }
 
-class _TodoAddPageState extends State<TodoAddPage> {
+class _TodoEditPageState extends State<TodoEditPage> {
   DateTime? dateTime;
   TextEditingController controller = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    controller.text = widget.editingTodo.task;
+    dateTime = widget.editingTodo.date;
+  }
 
   void createTodo() {
     if (controller.value.text == '') {
@@ -27,6 +36,12 @@ class _TodoAddPageState extends State<TodoAddPage> {
           date: dateTime);
       Navigator.pop(context, newTodo);
     }
+  }
+  void deleteTodo() {
+    var newTodo = TodoEmpty(
+        id: -1,
+        task: '',);
+    Navigator.pop(context, newTodo);
   }
 
   Future<void> createDate() async {
@@ -110,10 +125,21 @@ class _TodoAddPageState extends State<TodoAddPage> {
                     ? Text(convertDateFormat(dateTime!))
                     : null,
               ),
+              const Divider(),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: deleteTodo,
+                  icon: Icon(Icons.delete_outline),
+                  label: Text('Удалить'),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
 }

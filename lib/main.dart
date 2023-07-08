@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:todo_app/page/todo_add_page.dart';
+import 'package:todo_app/page/todo_edit_page.dart';
 import 'package:todo_app/page/todo_list_page.dart';
 
 void main() {
@@ -37,8 +38,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: {
-        '/': (context) => TodoListPage(),
-        '/add': (context) => TodoAddPage(),
+        '/': (context) => const TodoListPage(),
+        '/add': (context) => const TodoAddPage(),
 
       },
       initialRoute: '/',

@@ -4,11 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:todo_app/empty.dart';
+import 'package:todo_app/page/todo_edit_page.dart';
 
 import '../services.dart';
 
 class TodoListPage extends StatefulWidget {
-  TodoListPage({Key? key}) : super(key: key);
+  const TodoListPage({Key? key}) : super(key: key);
 
   @override
   State<TodoListPage> createState() => _TodoListPageState();
@@ -59,9 +60,24 @@ class _TodoListPageState extends State<TodoListPage> {
 
   Future<void> addTodo() async {
     final newTodo = await Navigator.of(context).pushNamed('/add');
-    if(newTodo!=null){
+    if (newTodo != null) {
       setState(() {
         _todos.add(newTodo as TodoEmpty);
+      });
+      saveTodos();
+    }
+  }
+
+  Future<void> editTodo(TodoEmpty editingTodo) async {
+    final newTodo = await Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => TodoEditPage(editingTodo)));
+    if (newTodo != null) {
+      setState(() {
+        var newTodoEmpt = newTodo as TodoEmpty;
+        _todos.removeWhere((element) => element.id == editingTodo.id);
+        if (newTodoEmpt.id != -1) {
+          _todos.add(newTodo);
+        }
       });
       saveTodos();
     }
@@ -87,7 +103,6 @@ class _TodoListPageState extends State<TodoListPage> {
     });
     saveTodos();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -140,76 +155,92 @@ class _TodoListPageState extends State<TodoListPage> {
                   itemBuilder: (context, index) {
                     var todo = todos[index];
                     return Dismissible(
-                        key: Key('${todo.id}'),
-                        direction: todo.completed
-                            ? DismissDirection.endToStart
-                            : DismissDirection.horizontal,
-                        confirmDismiss: (direction) async {
-                          if (direction == DismissDirection.startToEnd) {
-                            updateStatusTodo(todo.id);
-                            return !visibility;
-                          }else if (direction == DismissDirection.endToStart){
-                            return true;
-                          }
-                          return false;
+                      key: Key('${todo.id}'),
+                      direction: todo.completed
+                          ? DismissDirection.endToStart
+                          : DismissDirection.horizontal,
+                      confirmDismiss: (direction) async {
+                        if (direction == DismissDirection.startToEnd) {
+                          updateStatusTodo(todo.id);
+                          return !visibility;
+                        } else if (direction == DismissDirection.endToStart) {
+                          return true;
+                        }
+                        return false;
+                      },
+                      onDismissed: (direction) {
+                        if (direction == DismissDirection.startToEnd) {
+                          updateStatusTodo(todo.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Задача выполнена'),
+                            ),
+                          );
+                        } else if (direction == DismissDirection.endToStart) {
+                          deleteTodo(todo.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Задача удалена'),
+                            ),
+                          );
+                        }
+                      },
+                      background: Container(
+                        color: Colors.green,
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: const Icon(Icons.done),
+                      ),
+                      secondaryBackground: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: const Icon(Icons.delete),
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          editTodo(todo);
                         },
-                        onDismissed: (direction) {
-                          if (direction == DismissDirection.startToEnd) {
-                            updateStatusTodo(todo.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Задача выполнена'),
-                              ),
-                            );
-                          } else if (direction == DismissDirection.endToStart) {
-                            deleteTodo(todo.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Задача удалена'),
-                              ),
-                            );
-                          }
-                        },
-                        background: Container(
-                          color: Colors.green,
-                          child: Icon(Icons.done),
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(left: 16.0),
-                        ),
-                        secondaryBackground: Container(
-                          color: Colors.red,
-                          child: Icon(Icons.delete),
-                          alignment: Alignment.centerRight,
-                          padding: EdgeInsets.only(right: 16.0),
-                        ),
                         child: CheckboxListTile(
                           controlAffinity: ListTileControlAffinity.leading,
                           value: todo.completed,
                           onChanged: (_) {
                             updateStatusTodo(todo.id);
                           },
-                          title: Text(
-                            todo.task,
-                            style: todo.completed
-                                ? TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: themeData.disabledColor,
-                                  )
-                                : null,
+                          title: GestureDetector(
+                            onTap: () {
+                              editTodo(todo);
+                            },
+                            child: Text(
+                              todo.task,
+                              style: todo.completed
+                                  ? TextStyle(
+                                      decoration: TextDecoration.lineThrough,
+                                      color: themeData.disabledColor,
+                                    )
+                                  : null,
+                            ),
                           ),
                           subtitle: todo.date != null
-                              ? Text(
-                                  convertDateFormat(todo.date!),
-                                  style: todo.completed
-                                      ? TextStyle(
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                          color: themeData.disabledColor,
-                                        )
-                                      : null,
+                              ? GestureDetector(
+                                  onTap: () {
+                                    editTodo(todo);
+                                  },
+                                  child: Text(
+                                    convertDateFormat(todo.date!),
+                                    style: todo.completed
+                                        ? TextStyle(
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                            color: themeData.disabledColor,
+                                          )
+                                        : null,
+                                  ),
                                 )
                               : null,
-                        ));
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -223,5 +254,4 @@ class _TodoListPageState extends State<TodoListPage> {
       ),
     );
   }
-
 }
