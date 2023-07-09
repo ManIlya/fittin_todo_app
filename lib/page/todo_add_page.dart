@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/empty.dart';
-import 'package:todo_app/services.dart';
+
+import '../widget/deadline_widget.dart';
 
 class TodoAddPage extends StatefulWidget {
   const TodoAddPage({super.key});
@@ -10,8 +11,16 @@ class TodoAddPage extends StatefulWidget {
 }
 
 class _TodoAddPageState extends State<TodoAddPage> {
-  DateTime? dateTime;
+
+  late DeadlineWidget deadlineWidget;
   TextEditingController controller = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    deadlineWidget= DeadlineWidget(null);
+  }
 
   void createTodo() {
     if (controller.value.text == '') {
@@ -24,27 +33,9 @@ class _TodoAddPageState extends State<TodoAddPage> {
       var newTodo = TodoEmpty(
           id: UniqueKey().hashCode,
           task: controller.value.text,
-          date: dateTime);
+          date: deadlineWidget.dateTime);
       Navigator.pop(context, newTodo);
     }
-  }
-
-  Future<void> createDate() async {
-    var newDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    setState(() {
-      dateTime = newDate;
-    });
-  }
-
-  void deleteDate() {
-    setState(() {
-      dateTime = null;
-    });
   }
 
   @override
@@ -95,21 +86,7 @@ class _TodoAddPageState extends State<TodoAddPage> {
                   ),
                 ),
               ),
-              CheckboxListTile(
-                value: dateTime != null,
-                onChanged: (_) {
-                  if (dateTime == null) {
-                    createDate();
-                  } else {
-                    deleteDate();
-                  }
-                },
-                controlAffinity: ListTileControlAffinity.trailing,
-                title: const Text('Дедлайн'),
-                subtitle: dateTime != null
-                    ? Text(convertDateFormat(dateTime!))
-                    : null,
-              ),
+              deadlineWidget,
             ],
           ),
         ),

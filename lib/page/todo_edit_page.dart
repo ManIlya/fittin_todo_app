@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/empty.dart';
 import 'package:todo_app/services.dart';
+import 'package:todo_app/widget/deadline_widget.dart';
 
 class TodoEditPage extends StatefulWidget {
   TodoEmpty editingTodo;
@@ -11,7 +12,7 @@ class TodoEditPage extends StatefulWidget {
 }
 
 class _TodoEditPageState extends State<TodoEditPage> {
-  DateTime? dateTime;
+  late DeadlineWidget deadlineWidget;
   TextEditingController controller = TextEditingController();
 
 
@@ -19,7 +20,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
   void initState() {
     super.initState();
     controller.text = widget.editingTodo.task;
-    dateTime = widget.editingTodo.date;
+    deadlineWidget = DeadlineWidget(widget.editingTodo.date);
   }
 
   void createTodo() {
@@ -33,7 +34,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
       var newTodo = TodoEmpty(
           id: UniqueKey().hashCode,
           task: controller.value.text,
-          date: dateTime);
+          date: deadlineWidget.dateTime);
       Navigator.pop(context, newTodo);
     }
   }
@@ -44,23 +45,6 @@ class _TodoEditPageState extends State<TodoEditPage> {
     Navigator.pop(context, newTodo);
   }
 
-  Future<void> createDate() async {
-    var newDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-    setState(() {
-      dateTime = newDate;
-    });
-  }
-
-  void deleteDate() {
-    setState(() {
-      dateTime = null;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,21 +94,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
                   ),
                 ),
               ),
-              CheckboxListTile(
-                value: dateTime != null,
-                onChanged: (_) {
-                  if (dateTime == null) {
-                    createDate();
-                  } else {
-                    deleteDate();
-                  }
-                },
-                controlAffinity: ListTileControlAffinity.trailing,
-                title: const Text('Дедлайн'),
-                subtitle: dateTime != null
-                    ? Text(convertDateFormat(dateTime!))
-                    : null,
-              ),
+              deadlineWidget,
               const Divider(),
               Align(
                 alignment: Alignment.centerLeft,

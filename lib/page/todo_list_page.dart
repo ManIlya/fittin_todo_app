@@ -203,6 +203,7 @@ class _TodoListPageState extends State<TodoListPage> {
                         },
                         child: CheckboxListTile(
                           controlAffinity: ListTileControlAffinity.leading,
+                          fillColor: MaterialStateProperty.all(Colors.green),//заливка всего объема
                           value: todo.completed,
                           onChanged: (_) {
                             updateStatusTodo(todo.id);
