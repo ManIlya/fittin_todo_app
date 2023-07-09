@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/empty.dart';
 import 'package:todo_app/services.dart';
 import 'package:todo_app/widget/deadline_widget.dart';
+import 'package:todo_app/widget/todo_editing_text_widget.dart';
 
 class TodoEditPage extends StatefulWidget {
   TodoEmpty editingTodo;
@@ -13,18 +14,18 @@ class TodoEditPage extends StatefulWidget {
 
 class _TodoEditPageState extends State<TodoEditPage> {
   late DeadlineWidget deadlineWidget;
-  TextEditingController controller = TextEditingController();
+  late TodoTextFieldWidget todoTextFieldWidget;
 
 
   @override
   void initState() {
     super.initState();
-    controller.text = widget.editingTodo.task;
+    todoTextFieldWidget = TodoTextFieldWidget(widget.editingTodo.task);
     deadlineWidget = DeadlineWidget(widget.editingTodo.date);
   }
 
   void createTodo() {
-    if (controller.value.text == '') {
+    if (todoTextFieldWidget.controller.value.text == '') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Вы не ввели задание'),
@@ -33,7 +34,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
     } else {
       var newTodo = TodoEmpty(
           id: UniqueKey().hashCode,
-          task: controller.value.text,
+          task: todoTextFieldWidget.controller.value.text,
           date: deadlineWidget.dateTime);
       Navigator.pop(context, newTodo);
     }
@@ -71,29 +72,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
         child: Form(
           child: Column(
             children: [
-              Card(
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 17,
-                  vertical: 5,
-                ),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextFormField(
-                    controller: controller,
-                    maxLines: 10,
-                    minLines: 1,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-              ),
+              todoTextFieldWidget,
               deadlineWidget,
               const Divider(),
               Align(
