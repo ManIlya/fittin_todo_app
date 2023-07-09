@@ -249,6 +249,8 @@ class _TodoListPageState extends State<TodoListPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: themeData.primaryColor,
+        shape: CircleBorder(),
         onPressed: addTodo,
         child: const Icon(Icons.add),
       ),
