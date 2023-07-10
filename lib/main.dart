@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:todo_app/page/todo_add_page.dart';
 import 'package:todo_app/page/todo_edit_page.dart';
 import 'package:todo_app/page/todo_list_page.dart';
 
@@ -22,6 +21,9 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFFFF9900),
           primary: const Color(0xFFFF9900),
           background: const Color(0xFFEDEDED),
+          onBackground: const Color(0xFF000000),
+          error: const Color(0xFFF85535),
+          secondary: const Color(0xFF45B443),
           surface: Colors.white,
         ),
         textTheme: TextTheme(
@@ -39,8 +41,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/': (context) => const TodoListPage(),
-        '/add': (context) => const TodoAddPage(),
-
+        '/add': (context) => const TodoEditPage(),
       },
       initialRoute: '/',
     );

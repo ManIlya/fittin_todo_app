@@ -4,7 +4,7 @@ import '../services.dart';
 
 class DeadlineWidget extends StatefulWidget {
   DateTime? dateTime;
-  DeadlineWidget(this.dateTime, {super.key});
+  DeadlineWidget({this.dateTime, super.key});
 
   @override
   State<DeadlineWidget> createState() => _DeadlineWidgetState();
@@ -39,7 +39,7 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
           deleteDate();
         }
       },
-      fillColor: MaterialStateProperty.all(Colors.green),
+      //fillColor: MaterialStateProperty.all(Colors.green),
       controlAffinity: ListTileControlAffinity.trailing,
       title: const Text('Дедлайн'),
       subtitle: widget.dateTime != null

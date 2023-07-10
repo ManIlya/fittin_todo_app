@@ -70,7 +70,7 @@ class _TodoListPageState extends State<TodoListPage> {
 
   Future<void> editTodo(TodoEmpty editingTodo) async {
     final newTodo = await Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => TodoEditPage(editingTodo)));
+        MaterialPageRoute(builder: (context) => TodoEditPage(editingTodo: editingTodo)));
     if (newTodo != null) {
       setState(() {
         var newTodoEmpt = newTodo as TodoEmpty;
@@ -203,7 +203,7 @@ class _TodoListPageState extends State<TodoListPage> {
                         },
                         child: CheckboxListTile(
                           controlAffinity: ListTileControlAffinity.leading,
-                          fillColor: MaterialStateProperty.all(Colors.green),//заливка всего объема
+                          //fillColor: MaterialStateProperty.all(Colors.green),//заливка всего объема
                           value: todo.completed,
                           onChanged: (_) {
                             updateStatusTodo(todo.id);
@@ -251,7 +251,7 @@ class _TodoListPageState extends State<TodoListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: themeData.primaryColor,
-        shape: CircleBorder(),
+        shape: const CircleBorder(),
         onPressed: addTodo,
         child: const Icon(Icons.add),
       ),
