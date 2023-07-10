@@ -136,116 +136,121 @@ class _TodoListPageState extends State<TodoListPage> {
                 ),
               ],
             ),
-            SliverToBoxAdapter(
-              child: Card(
-                elevation: 4,
+            SliverList(
+                delegate: SliverChildBuilderDelegate(childCount: todos.length,
+                    (context, index) {
+              var todo = todos[index];
+              return Container(
                 margin: const EdgeInsets.symmetric(
                   horizontal: 17,
-                  vertical: 5,
+                  vertical: 0,
                 ),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
+                  child: Dismissible(
+                    key: Key('${todo.id}'),
+                    direction: todo.completed
+                        ? DismissDirection.endToStart
+                        : DismissDirection.horizontal,
+                    confirmDismiss: (direction) async {
+                      if (direction == DismissDirection.startToEnd) {
+                        updateStatusTodo(todo.id);
+                        return !visibility;
+                      } else if (direction == DismissDirection.endToStart) {
+                        return true;
+                      }
+                      return false;
+                    },
+                    onDismissed: (direction) {
+                      if (direction == DismissDirection.startToEnd) {
+                        updateStatusTodo(todo.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Задача выполнена'),
+                          ),
+                        );
+                      } else if (direction == DismissDirection.endToStart) {
+                        deleteTodo(todo.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Задача удалена'),
+                          ),
+                        );
+                      }
+                    },
+                    background: Container(
+                      color: Colors.green,
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: const Icon(Icons.done),
+                    ),
+                    secondaryBackground: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: const Icon(Icons.delete),
+                    ),
+                    child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: themeData.colorScheme.surface,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(index == 0 ? 20 : 0),
+                        bottom:
+                            Radius.circular(index == todos.length - 1 ? 20 : 0),
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          blurRadius: 4,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        editTodo(todo);
+                      },
+                      child: CheckboxListTile(
+                        controlAffinity: ListTileControlAffinity.leading,
+                        //fillColor: MaterialStateProperty.all(Colors.green),//заливка всего объема
+                        value: todo.completed,
+                        onChanged: (_) {
+                          updateStatusTodo(todo.id);
+                        },
+                        title: GestureDetector(
+                          onTap: () {
+                            editTodo(todo);
+                          },
+                          child: Text(
+                            todo.task,
+                            style: todo.completed
+                                ? TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: themeData.disabledColor,
+                                  )
+                                : null,
+                          ),
+                        ),
+                        subtitle: todo.date != null
+                            ? GestureDetector(
+                                onTap: () {
+                                  editTodo(todo);
+                                },
+                                child: Text(
+                                  convertDateFormat(todo.date!),
+                                  style: todo.completed
+                                      ? TextStyle(
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                          color: themeData.disabledColor,
+                                        )
+                                      : null,
+                                ),
+                              )
+                            : null,
+                      ),
+                    ),
                   ),
                 ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: todos.length,
-                  itemBuilder: (context, index) {
-                    var todo = todos[index];
-                    return Dismissible(
-                      key: Key('${todo.id}'),
-                      direction: todo.completed
-                          ? DismissDirection.endToStart
-                          : DismissDirection.horizontal,
-                      confirmDismiss: (direction) async {
-                        if (direction == DismissDirection.startToEnd) {
-                          updateStatusTodo(todo.id);
-                          return !visibility;
-                        } else if (direction == DismissDirection.endToStart) {
-                          return true;
-                        }
-                        return false;
-                      },
-                      onDismissed: (direction) {
-                        if (direction == DismissDirection.startToEnd) {
-                          updateStatusTodo(todo.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Задача выполнена'),
-                            ),
-                          );
-                        } else if (direction == DismissDirection.endToStart) {
-                          deleteTodo(todo.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Задача удалена'),
-                            ),
-                          );
-                        }
-                      },
-                      background: Container(
-                        color: Colors.green,
-                        alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.only(left: 16.0),
-                        child: const Icon(Icons.done),
-                      ),
-                      secondaryBackground: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: const Icon(Icons.delete),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          editTodo(todo);
-                        },
-                        child: CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          //fillColor: MaterialStateProperty.all(Colors.green),//заливка всего объема
-                          value: todo.completed,
-                          onChanged: (_) {
-                            updateStatusTodo(todo.id);
-                          },
-                          title: GestureDetector(
-                            onTap: () {
-                              editTodo(todo);
-                            },
-                            child: Text(
-                              todo.task,
-                              style: todo.completed
-                                  ? TextStyle(
-                                      decoration: TextDecoration.lineThrough,
-                                      color: themeData.disabledColor,
-                                    )
-                                  : null,
-                            ),
-                          ),
-                          subtitle: todo.date != null
-                              ? GestureDetector(
-                                  onTap: () {
-                                    editTodo(todo);
-                                  },
-                                  child: Text(
-                                    convertDateFormat(todo.date!),
-                                    style: todo.completed
-                                        ? TextStyle(
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                            color: themeData.disabledColor,
-                                          )
-                                        : null,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
+              );
+            })),
           ],
         ),
       ),

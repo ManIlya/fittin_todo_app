@@ -15,25 +15,34 @@ class TodoTextFieldWidget extends StatefulWidget {
 class _TodoTextFieldWidgetState extends State<TodoTextFieldWidget> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(
+    final themeData = Theme.of(context);
+    return Container(
+      margin: EdgeInsets.symmetric(
         horizontal: 17,
         vertical: 5,
       ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(20),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: themeData.colorScheme.surface,
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 4,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: TextFormField(
-          controller: widget.controller,
-          maxLines: 10,
-          minLines: 1,
-          decoration: const InputDecoration(
-            border: InputBorder.none,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: TextFormField(
+            controller: widget.controller,
+            maxLines: 10,
+            minLines: 1,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+            ),
           ),
         ),
       ),
