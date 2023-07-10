@@ -19,14 +19,14 @@ class _TodoListPageState extends State<TodoListPage> {
   List<TodoEmpty> _todos = [];
   int ids = 1;
   bool visibility = false;
-
+  late final _todosLoading;
   @override
   void initState() {
     super.initState();
-    loadTodos();
+    _todosLoading = loadTodos();
   }
 
-  Future<void> loadTodos() async {
+  Future<List<TodoEmpty>?> loadTodos() async {
     try {
       final file = await getFile();
       if (await file.exists()) {
@@ -36,6 +36,7 @@ class _TodoListPageState extends State<TodoListPage> {
         setState(() {
           _todos = loadedTodos;
         });
+        return loadedTodos;
       }
     } catch (e) {
       print('Failed to load todos: $e');
@@ -121,120 +122,117 @@ class _TodoListPageState extends State<TodoListPage> {
         ),
       ),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              backgroundColor: themeData.colorScheme.background,
-              title: Text('Выполнено-$countComplete'),
-              actions: [
-                IconButton(
-                  onPressed: updateVisibility,
-                  icon: Icon(
-                    visibility ? Icons.visibility : Icons.visibility_off,
-                    color: themeData.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            SliverList(
-                delegate: SliverChildBuilderDelegate(childCount: todos.length,
-                    (context, index) {
-              var todo = todos[index];
-              return Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 17,
-                  vertical: 0,
-                ),
-                  child: Dismissible(
-                    key: Key('${todo.id}'),
-                    direction: todo.completed
-                        ? DismissDirection.endToStart
-                        : DismissDirection.horizontal,
-                    confirmDismiss: (direction) async {
-                      if (direction == DismissDirection.startToEnd) {
-                        updateStatusTodo(todo.id);
-                        return !visibility;
-                      } else if (direction == DismissDirection.endToStart) {
-                        return true;
-                      }
-                      return false;
-                    },
-                    onDismissed: (direction) {
-                      if (direction == DismissDirection.startToEnd) {
-                        updateStatusTodo(todo.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Задача выполнена'),
-                          ),
-                        );
-                      } else if (direction == DismissDirection.endToStart) {
-                        deleteTodo(todo.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Задача удалена'),
-                          ),
-                        );
-                      }
-                    },
-                    background: Container(
-                      color: Colors.green,
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: const Icon(Icons.done),
-                    ),
-                    secondaryBackground: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: const Icon(Icons.delete),
-                    ),
-                    child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: themeData.colorScheme.surface,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(index == 0 ? 20 : 0),
-                        bottom:
-                            Radius.circular(index == todos.length - 1 ? 20 : 0),
+        child: FutureBuilder<List<TodoEmpty>?>(
+          future: _todosLoading,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Ошибка: ${snapshot.error}'),
+              );
+            } else {
+              return CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    backgroundColor: themeData.colorScheme.background,
+                    title: Text('Выполнено-$countComplete'),
+                    actions: [
+                      IconButton(
+                        onPressed: updateVisibility,
+                        icon: Icon(
+                          visibility ? Icons.visibility : Icons.visibility_off,
+                          color: themeData.primaryColor,
+                        ),
                       ),
-                      boxShadow: const [
-                        BoxShadow(
-                          blurRadius: 4,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        editTodo(todo);
-                      },
-                      child: CheckboxListTile(
-                        controlAffinity: ListTileControlAffinity.leading,
-                        //fillColor: MaterialStateProperty.all(Colors.green),//заливка всего объема
-                        value: todo.completed,
-                        onChanged: (_) {
-                          updateStatusTodo(todo.id);
+                    ],
+                  ),
+                  SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                          childCount: todos.length, (context, index) {
+                    var todo = todos[index];
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 17,
+                        vertical: 0,
+                      ),
+                      child: Dismissible(
+                        key: Key('${todo.id}'),
+                        direction: todo.completed
+                            ? DismissDirection.endToStart
+                            : DismissDirection.horizontal,
+                        confirmDismiss: (direction) async {
+                          if (direction == DismissDirection.startToEnd) {
+                            updateStatusTodo(todo.id);
+                            return !visibility;
+                          } else if (direction == DismissDirection.endToStart) {
+                            return true;
+                          }
+                          return false;
                         },
-                        title: GestureDetector(
-                          onTap: () {
-                            editTodo(todo);
-                          },
-                          child: Text(
-                            todo.task,
-                            style: todo.completed
-                                ? TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: themeData.disabledColor,
-                                  )
-                                : null,
-                          ),
+                        onDismissed: (direction) {
+                          if (direction == DismissDirection.startToEnd) {
+                            updateStatusTodo(todo.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Задача выполнена'),
+                              ),
+                            );
+                          } else if (direction == DismissDirection.endToStart) {
+                            deleteTodo(todo.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Задача удалена'),
+                              ),
+                            );
+                          }
+                        },
+                        background: Container(
+                          color: Colors.green,
+                          alignment: Alignment.centerLeft,
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: const Icon(Icons.done),
                         ),
-                        subtitle: todo.date != null
-                            ? GestureDetector(
+                        secondaryBackground: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: const Icon(Icons.delete),
+                        ),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: themeData.colorScheme.surface,
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(index == 0 ? 20 : 0),
+                              bottom: Radius.circular(
+                                  index == todos.length - 1 ? 20 : 0),
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 4,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              editTodo(todo);
+                            },
+                            child: CheckboxListTile(
+                              controlAffinity: ListTileControlAffinity.leading,
+                              //fillColor: MaterialStateProperty.all(Colors.green),//заливка всего объема
+                              value: todo.completed,
+                              onChanged: (_) {
+                                updateStatusTodo(todo.id);
+                              },
+                              title: GestureDetector(
                                 onTap: () {
                                   editTodo(todo);
                                 },
                                 child: Text(
-                                  convertDateFormat(todo.date!),
+                                  todo.task,
                                   style: todo.completed
                                       ? TextStyle(
                                           decoration:
@@ -243,15 +241,34 @@ class _TodoListPageState extends State<TodoListPage> {
                                         )
                                       : null,
                                 ),
-                              )
-                            : null,
+                              ),
+                              subtitle: todo.date != null
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        editTodo(todo);
+                                      },
+                                      child: Text(
+                                        convertDateFormat(todo.date!),
+                                        style: todo.completed
+                                            ? TextStyle(
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                                color: themeData.disabledColor,
+                                              )
+                                            : null,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
+                    );
+                  })),
+                ],
               );
-            })),
-          ],
+            }
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
