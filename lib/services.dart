@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 String convertDateFormat(DateTime dateTime) {
-  return '${dateTime.year.toString().padLeft(4, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
+  return DateFormat('yyyy-MM-dd').format(dateTime);
 }
