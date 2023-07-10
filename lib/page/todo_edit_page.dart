@@ -54,7 +54,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    var themeData = Theme.of(context);
+    final themeData = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: themeData.colorScheme.background,
@@ -69,7 +69,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
             onPressed: createTodo,
             child: Text('Сохранить',
                 style: themeData.textTheme.titleSmall
-                    ?.copyWith(color: themeData.primaryColor)),
+                    ?.copyWith(color: themeData.colorScheme.primary)),
           )
         ],
       ),
@@ -87,7 +87,8 @@ class _TodoEditPageState extends State<TodoEditPage> {
                     onPressed: deleteTodo,
                     icon: const Icon(Icons.delete_outline),
                     label: const Text('Удалить'),
-                    style: TextButton.styleFrom(foregroundColor: Colors.red),
+                    style: TextButton.styleFrom(
+                        foregroundColor: themeData.colorScheme.error),
                   ),
                 ),
               ]
