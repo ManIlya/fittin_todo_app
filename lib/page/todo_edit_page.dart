@@ -15,27 +15,30 @@ class TodoEditPage extends StatefulWidget {
 class _TodoEditPageState extends State<TodoEditPage> {
   late DeadlineWidget deadlineWidget;
   late TodoTextFieldWidget todoTextFieldWidget;
-  late final TextEditingController controller =
-      TextEditingController(text: widget.editingTodo?.task);
+  DateTime? _selectedState;
+  final TextEditingController _controller =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    todoTextFieldWidget = TodoTextFieldWidget(controller: controller);
-    if (widget.editingTodo != null) {
-      deadlineWidget = DeadlineWidget(dateTime: widget.editingTodo!.date);
-    } else {
-      deadlineWidget = DeadlineWidget();
-    }
+     _controller.text = widget.editingTodo?.task??'';
+    _selectedState = widget.editingTodo?.date;
+    todoTextFieldWidget = TodoTextFieldWidget(controller: _controller);
+    deadlineWidget = DeadlineWidget(dateTime: _selectedState, onDateChanged: (newDate){
+      setState(() {
+        _selectedState = newDate;
+      });
+    },);
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
   void createTodo() {
-    if (controller.value.text == '') {
+    if (_controller.value.text == '') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Вы не ввели задание'),
@@ -44,8 +47,8 @@ class _TodoEditPageState extends State<TodoEditPage> {
     } else {
       var newTodo = TodoEmpty(
           id: UniqueKey().hashCode,
-          task: controller.value.text,
-          date: deadlineWidget.dateTime);
+          task: _controller.value.text,
+          date: _selectedState);
       Navigator.pop(context, newTodo);
     }
   }

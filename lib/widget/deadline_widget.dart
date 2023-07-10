@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import '../services.dart';
 
 class DeadlineWidget extends StatefulWidget {
-  DateTime? dateTime;
+  final DateTime? dateTime;
+  final ValueChanged<DateTime?> onDateChanged;
 
-  DeadlineWidget({this.dateTime, super.key});
+  const DeadlineWidget({this.dateTime, required this.onDateChanged,  super.key});
 
   @override
   State<DeadlineWidget> createState() => _DeadlineWidgetState();
 }
 
 class _DeadlineWidgetState extends State<DeadlineWidget> {
+  DateTime? _date;
   Future<void> createDate() async {
     var newDate = await showDatePicker(
       context: context,
@@ -20,22 +22,28 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     setState(() {
-      widget.dateTime = newDate;
+      _date = newDate;
+      widget.onDateChanged(newDate);
     });
   }
 
   void deleteDate() {
     setState(() {
-      widget.dateTime = null;
+      widget.onDateChanged(null);
     });
   }
+  @override
+  void initState() {
+    _date = widget.dateTime;
+    super.initState();
 
+  }
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-      value: widget.dateTime != null,
+      value: _date != null,
       onChanged: (_) {
-        if (widget.dateTime == null) {
+        if (_date == null) {
           createDate();
         } else {
           deleteDate();
@@ -44,8 +52,8 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
       //fillColor: MaterialStateProperty.all(Colors.green),
       controlAffinity: ListTileControlAffinity.trailing,
       title: const Text('Дедлайн'),
-      subtitle: widget.dateTime != null
-          ? Text(convertDateFormat(widget.dateTime!))
+      subtitle: _date != null
+          ? Text(convertDateFormat(_date!))
           : null,
     );
   }
