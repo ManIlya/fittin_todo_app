@@ -69,8 +69,8 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   Future<void> editTodo(TodoEmpty editingTodo) async {
-    final newTodo = await Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => TodoEditPage(editingTodo: editingTodo)));
+    final newTodo = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => TodoEditPage(editingTodo: editingTodo)));
     if (newTodo != null) {
       setState(() {
         var newTodoEmpt = newTodo as TodoEmpty;

@@ -67,9 +67,11 @@ class _TodoEditPageState extends State<TodoEditPage> {
         actions: [
           TextButton(
             onPressed: createTodo,
-            child: Text('Сохранить',
-                style: themeData.textTheme.titleSmall
-                    ?.copyWith(color: themeData.colorScheme.primary)),
+            child: Text(
+              'Сохранить',
+              style: themeData.textTheme.titleSmall
+                  ?.copyWith(color: themeData.colorScheme.primary),
+            ),
           )
         ],
       ),

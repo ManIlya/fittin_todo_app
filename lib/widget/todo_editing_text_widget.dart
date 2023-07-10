@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class TodoTextFieldWidget extends StatefulWidget {
   TextEditingController controller = TextEditingController();
-  TodoTextFieldWidget({String? task, super.key}){
+
+  TodoTextFieldWidget({String? task, super.key}) {
     controller.text = task ?? '';
     //todo передовать контроллер
   }

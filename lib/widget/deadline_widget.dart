@@ -4,6 +4,7 @@ import '../services.dart';
 
 class DeadlineWidget extends StatefulWidget {
   DateTime? dateTime;
+
   DeadlineWidget({this.dateTime, super.key});
 
   @override
@@ -28,6 +29,7 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
       widget.dateTime = null;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
@@ -48,4 +50,3 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
     );
   }
 }
-
