@@ -16,20 +16,22 @@ class _TodoEditPageState extends State<TodoEditPage> {
   late DeadlineWidget deadlineWidget;
   late TodoTextFieldWidget todoTextFieldWidget;
   DateTime? _selectedState;
-  final TextEditingController _controller =
-      TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-     _controller.text = widget.editingTodo?.task??'';
+    _controller.text = widget.editingTodo?.task ?? '';
     _selectedState = widget.editingTodo?.date;
     todoTextFieldWidget = TodoTextFieldWidget(controller: _controller);
-    deadlineWidget = DeadlineWidget(dateTime: _selectedState, onDateChanged: (newDate){
-      setState(() {
-        _selectedState = newDate;
-      });
-    },);
+    deadlineWidget = DeadlineWidget(
+      dateTime: _selectedState,
+      onDateChanged: (newDate) {
+        setState(() {
+          _selectedState = newDate;
+        });
+      },
+    );
   }
 
   @override
@@ -37,6 +39,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
     _controller.dispose();
     super.dispose();
   }
+
   void createTodo() {
     if (_controller.value.text == '') {
       ScaffoldMessenger.of(context).showSnackBar(

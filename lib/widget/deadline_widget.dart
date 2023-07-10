@@ -6,7 +6,7 @@ class DeadlineWidget extends StatefulWidget {
   final DateTime? dateTime;
   final ValueChanged<DateTime?> onDateChanged;
 
-  const DeadlineWidget({this.dateTime, required this.onDateChanged,  super.key});
+  const DeadlineWidget({this.dateTime, required this.onDateChanged, super.key});
 
   @override
   State<DeadlineWidget> createState() => _DeadlineWidgetState();
@@ -14,6 +14,7 @@ class DeadlineWidget extends StatefulWidget {
 
 class _DeadlineWidgetState extends State<DeadlineWidget> {
   DateTime? _date;
+
   Future<void> createDate() async {
     var newDate = await showDatePicker(
       context: context,
@@ -32,12 +33,13 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
       widget.onDateChanged(null);
     });
   }
+
   @override
   void initState() {
     _date = widget.dateTime;
     super.initState();
-
   }
+
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
@@ -52,9 +54,7 @@ class _DeadlineWidgetState extends State<DeadlineWidget> {
       //fillColor: MaterialStateProperty.all(Colors.green),
       controlAffinity: ListTileControlAffinity.trailing,
       title: const Text('Дедлайн'),
-      subtitle: _date != null
-          ? Text(convertDateFormat(_date!))
-          : null,
+      subtitle: _date != null ? Text(convertDateFormat(_date!)) : null,
     );
   }
 }
