@@ -15,21 +15,27 @@ class TodoEditPage extends StatefulWidget {
 class _TodoEditPageState extends State<TodoEditPage> {
   late DeadlineWidget deadlineWidget;
   late TodoTextFieldWidget todoTextFieldWidget;
+  late final TextEditingController controller =
+      TextEditingController(text: widget.editingTodo?.task);
 
   @override
   void initState() {
     super.initState();
+    todoTextFieldWidget = TodoTextFieldWidget(controller: controller);
     if (widget.editingTodo != null) {
-      todoTextFieldWidget = TodoTextFieldWidget(task: widget.editingTodo!.task);
       deadlineWidget = DeadlineWidget(dateTime: widget.editingTodo!.date);
     } else {
-      todoTextFieldWidget = TodoTextFieldWidget();
       deadlineWidget = DeadlineWidget();
     }
   }
 
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
   void createTodo() {
-    if (todoTextFieldWidget.controller.value.text == '') {
+    if (controller.value.text == '') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Вы не ввели задание'),
@@ -38,7 +44,7 @@ class _TodoEditPageState extends State<TodoEditPage> {
     } else {
       var newTodo = TodoEmpty(
           id: UniqueKey().hashCode,
-          task: todoTextFieldWidget.controller.value.text,
+          task: controller.value.text,
           date: deadlineWidget.dateTime);
       Navigator.pop(context, newTodo);
     }
